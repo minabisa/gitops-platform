@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: gitops-app
-          image: gitops-app:latest   # Argo CD will patch this with the real ECR URL
+          image: 928535088615.dkr.ecr.us-east-1.amazonaws.com/gitops-platform-dev:bbd7f78
           ports:
             - containerPort: 5000
           env:
