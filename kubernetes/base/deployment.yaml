@@ -18,7 +18,7 @@ spec:
         - name: ecr-secret
       containers:
         - name: gitops-app
-          image: 928535088615.dkr.ecr.us-east-1.amazonaws.com/gitops-platform-dev:59afbec
+          image: 928535088615.dkr.ecr.us-east-1.amazonaws.com/gitops-platform-dev:36db56e
           ports:
             - containerPort: 5000
           env:
