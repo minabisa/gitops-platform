@@ -60,8 +60,8 @@ module "eks" {
   public_subnet_ids  = module.vpc.public_subnet_ids
   private_subnet_ids = module.vpc.private_subnet_ids
   node_instance_type = "t3.small"
-  node_desired       = 1
-  node_min           = 1
-  node_max           = 2
+  node_desired       = 2
+  node_min           = 2
+  node_max           = 3
   tags               = local.tags
 }

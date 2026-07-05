@@ -14,9 +14,11 @@ spec:
       labels:
         app: gitops-app
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
         - name: gitops-app
-          image: 928535088615.dkr.ecr.us-east-1.amazonaws.com/gitops-platform-dev:bbd7f78
+          image: 928535088615.dkr.ecr.us-east-1.amazonaws.com/gitops-platform-dev:latest
           ports:
             - containerPort: 5000
           env:
@@ -30,7 +32,6 @@ spec:
                 configMapKeyRef:
                   name: app-config
                   key: APP_VERSION
-          # Health checks — Kubernetes uses these to know if the pod is ready
           readinessProbe:
             httpGet:
               path: /health
