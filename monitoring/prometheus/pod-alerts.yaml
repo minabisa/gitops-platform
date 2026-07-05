@@ -1,0 +1,48 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gitops-app-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack   # Must match for Prometheus to pick it up
+spec:
+  groups:
+    - name: gitops-app
+      rules:
+        # Alert if any app pod is down for more than 2 minutes
+        - alert: AppPodDown
+          expr: |
+            kube_pod_status_ready{
+              namespace=~"dev|staging|prod",
+              condition="true"
+            } == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Pod {{ $labels.pod }} is not ready"
+            description: "Pod {{ $labels.pod }} in {{ $labels.namespace }} has been not ready for 2 minutes"
+
+        # Alert if pod restarts more than 3 times
+        - alert: AppPodCrashLooping
+          expr: |
+            rate(kube_pod_container_status_restarts_total{
+              namespace=~"dev|staging|prod"
+            }[5m]) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod {{ $labels.pod }} is crash looping"
+            description: "Pod {{ $labels.pod }} in {{ $labels.namespace }} is restarting frequently"
+
+        # Alert if node memory usage exceeds 80%
+        - alert: HighMemoryUsage
+          expr: |
+            (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage on node {{ $labels.instance }}"
+            description: "Memory usage is above 80% on {{ $labels.instance }}"
