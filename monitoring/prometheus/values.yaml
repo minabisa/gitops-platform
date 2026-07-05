@@ -1,0 +1,63 @@
+# Grafana config
+grafana:
+  enabled: true
+  adminPassword: "gitops-admin-2024"
+  service:
+    type: ClusterIP
+  persistence:
+    enabled: false   # No persistent storage needed for dev
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: default
+          folder: ""
+          type: file
+          options:
+            path: /var/lib/grafana/dashboards/default
+  # Pre-load useful Kubernetes dashboards
+  dashboards:
+    default:
+      kubernetes-cluster:
+        gnetId: 7249    # Kubernetes Cluster dashboard from grafana.com
+        revision: 1
+        datasource: Prometheus
+      kubernetes-pods:
+        gnetId: 6781    # Pod monitoring dashboard
+        revision: 1
+        datasource: Prometheus
+
+# Prometheus config
+prometheus:
+  prometheusSpec:
+    # How long to keep metrics — 7 days is enough for dev
+    retention: 7d
+    resources:
+      requests:
+        memory: "400Mi"
+        cpu: "200m"
+      limits:
+        memory: "600Mi"
+        cpu: "400m"
+    # Scrape ALL namespaces including dev, staging, prod
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+
+# Reduce resource usage for small nodes
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "10m"
+      limits:
+        memory: "128Mi"
+        cpu: "50m"
+
+# Node exporter — collects CPU, memory, disk metrics from each node
+nodeExporter:
+  enabled: true
+
+# kube-state-metrics — tracks Kubernetes object states
+kubeStateMetrics:
+  enabled: true
